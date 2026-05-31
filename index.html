@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облік включень/виключень – Спільний доступ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            font-size: 1.25rem;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        button:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-on {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+        
+        .btn-off {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            color: white;
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            background: #f0f0f0;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .history {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .history-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .history-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        
+        .refresh-btn, .clear-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: 0.2s;
+        }
+        
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .refresh-btn:hover, .clear-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: background 0.2s;
+        }
+        
+        .history-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .emoji {
+            font-size: 1.5rem;
+        }
+        
+        .action {
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 600px) {
+            .card {
+                padding: 1.5rem;
+            }
+            
+            button {
+                font-size: 1rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .timestamp {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>
+                <span>📊</span>
+                Облік включень/виключень
+            </h1>
+            <div class="subtitle">Спільна історія для всієї команди</div>
+            
+            <div class="buttons">
+                <button class="btn-on" id="btnOn">✅ Включились</button>
+                <button class="btn-off" id="btnOff">❌ Виключились</button>
+            </div>
+            
+            <div class="status" id="statusMessage">
+                💡 Натисніть кнопку, щоб зафіксувати дію
+            </div>
+        </div>
+        
+        <div class="history">
+            <div class="history-header">
+                <h2>📜 Історія подій</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="refresh-btn" id="refreshBtn">🔄 Оновити</button>
+                    <button class="clear-btn" id="clearAllBtn">🗑️ Очистити всі</button>
+                </div>
+            </div>
+            <div id="historyContainer">
+                <div class="loading">Завантаження історії...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ ВАЖЛИВО: Вставте сюди ваш URL з Google Apps Script!
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyb3RguwytwEn3xA3uDga_OG0QamjwXxvqAUXXFDA_XtiO3bYZJ9GeDaPJ1h-TtvMm8TA/exec';
+        
+        let isLoading = false;
+        
+        // Показати повідомлення про статус
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = isError ? `❌ ${message}` : `✅ ${message}`;
+            statusDiv.style.background = isError ? '#fee' : '#e8f5e9';
+            setTimeout(() => {
+                if (document.getElementById('statusMessage').innerHTML === `✅ ${message}` || 
+                    document.getElementById('statusMessage').innerHTML === `❌ ${message}`) {
+                    statusDiv.innerHTML = '💡 Готовий до запису';
+                    statusDiv.style.background = '#f0f0f0';
+                }
+            }, 3000);
+        }
+        
+        // Додати нову подію
+        async function addEvent(action) {
+            if (isLoading) {
+                showStatus('Зачекайте, попередня дія ще виконується...', true);
+                return;
+            }
+            
+            isLoading = true;
+            document.getElementById('btnOn').disabled = true;
+            document.getElementById('btnOff').disabled = true;
+            
+            try {
+                const response = await fetch(`${API_URL}?action=${encodeURIComponent(action)}&t=${Date.now()}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`Подію "${action}" збережено!`);
+                    loadHistory(); // Перезавантажуємо історію
+                } else {
+                    showStatus('Помилка збереження', true);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Помилка зєднання з сервером', true);
+            } finally {
+                isLoading = false;
+                document.getElementById('btnOn').disabled = false;
+                document.getElementById('btnOff').disabled = false;
+            }
+        }
+        
+        // Завантажити історію
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = '<div class="loading">Завантаження...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}?t=${Date.now()}`);
+                const result = await response.json();
+                
+                if (!result.success || !result.data || result.data.length === 0) {
+                    container.innerHTML = '<div class="loading" style="color: #999;">📭 Поки що немає жодної події. Натисніть кнопку вище 👆</div>';
+                    return;
+                }
+                
+                // Відображаємо історію
+                container.innerHTML = '';
+                const listDiv = document.createElement('div');
+                listDiv.className = 'history-list';
+                
+                result.data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    const emoji = item.action === 'включились' ? '🟢' : '🔴';
+                    div.innerHTML = `
+                        <div class="emoji">${emoji}</div>
+                        <div class="action"><strong>${item.action}</strong></div>
+                        <div class="timestamp">${item.date} ${item.time}</div>
+                    `;
+                    listDiv.appendChild(div);
+                });
+                
+                container.appendChild(listDiv);
+                
+            } catch (error) {
+                console.error('Error loading history:', error);
+                container.innerHTML = '<div class="loading error">❌ Помилка завантаження. Перевірте з\'єднання або URL API.</div>';
+            }
+        }
+        
+        // Очистити всю історію (тільки якщо ви хочете додати таку функцію)
+        // Для очищення потрібно додати окремий endpoint в Apps Script
+        async function clearAllHistory() {
+            if (!confirm('⚠️ УВАГА! Це видалить ВСЮ історію для всіх. Ви впевнені?')) return;
+            
+            showStatus('Функція очищення потребує додаткового налаштування в Google Apps Script', true);
+            // Якщо потрібна функція очищення - я додам код
+        }
+        
+        // Події кнопок
+        document.getElementById('btnOn').addEventListener('click', () => addEvent('включились'));
+        document.getElementById('btnOff').addEventListener('click', () => addEvent('виключились'));
+        document.getElementById('refreshBtn').addEventListener('click', () => loadHistory());
+        document.getElementById('clearAllBtn').addEventListener('click', () => clearAllHistory());
+        
+        // Завантажуємо історію при завантаженні сторінки
+        loadHistory();
+        
+        // Оновлюємо кожні 30 секунд (опціонально)
+        setInterval(loadHistory, 30000);
+    </script>
+</body>
+</html>
