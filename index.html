@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Облік включень/виключень – Спільний доступ</title>
+    <link rel="icon" href="https://em-content.zobj.net/source/apple/391/bar-chart_1f4ca.png">
+    <title>Облік увімкнень/вимкнень</title>
     <style>
         * {
             margin: 0;
@@ -207,13 +208,13 @@
         <div class="card">
             <h1>
                 <span>📊</span>
-                Облік включень/виключень
+                Облік увімкнень/вимкнень
             </h1>
             <div class="subtitle">Спільна історія для всієї команди</div>
             
             <div class="buttons">
-                <button class="btn-on" id="btnOn">✅ Включились</button>
-                <button class="btn-off" id="btnOff">❌ Виключились</button>
+                <button class="btn-on" id="btnOn">✅ Увімкнулись</button>
+                <button class="btn-off" id="btnOff">❌ Вимкнулись</button>
             </div>
             
             <div class="status" id="statusMessage">
@@ -348,8 +349,8 @@
         }
         
         // Події кнопок
-        document.getElementById('btnOn').addEventListener('click', () => addEvent('включились'));
-        document.getElementById('btnOff').addEventListener('click', () => addEvent('виключились'));
+        document.getElementById('btnOn').addEventListener('click', () => addEvent('Увімкнулись'));
+        document.getElementById('btnOff').addEventListener('click', () => addEvent('Вимкнулись'));
         document.getElementById('refreshBtn').addEventListener('click', () => loadHistory());
         document.getElementById('clearAllBtn').addEventListener('click', () => clearAllHistory());
         
@@ -357,7 +358,7 @@
         loadHistory();
         
         // Оновлюємо кожні 30 секунд (опціонально)
-        setInterval(loadHistory, 30000);
+        setInterval(loadHistory, 300000);
     </script>
 </body>
 </html>
